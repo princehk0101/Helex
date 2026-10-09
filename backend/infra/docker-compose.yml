@@ -1,0 +1,30 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: helex-postgres
+    restart: always
+    environment:
+      POSTGRES_USER: ${DB_USER:-helex_admin}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-helex_secret}
+      # This will run scripts from docker-entrypoint-initdb.d on first start
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./postgres/init-databases.sql:/docker-entrypoint-initdb.d/init-databases.sql
+
+  redis:
+    image: redis:7-alpine
+    container_name: helex-redis
+    restart: always
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    command: redis-server --appendonly yes
+
+volumes:
+  postgres_data:
+  redis_data:
