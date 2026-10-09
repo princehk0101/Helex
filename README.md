@@ -1,84 +1,88 @@
-# Helex
+<div align="center">
+  <h1>🚀 Helex</h1>
+  <p><b>A Collaborative Online Code Editor (VS Code in the Browser)</b></p>
+</div>
 
-Helex ek collaborative online code editor hai (VS Code jaisa interface), jahan team ke log alag-alag locations se ek hi project par ek saath live code kar sakte hain. Har user ka cursor, naam aur changes real-time me dikhte hain.
+Helex is a real-time, collaborative online code editor that brings the familiar VS Code interface to the browser. Designed for seamless remote pair programming, it allows team members from different locations to write code simultaneously, complete with real-time sync, colored cursors, and presence indicators.
 
-## Features
-- Login / Register (JWT authentication)
-- Projects, team members aur roles (Owner, Editor, Viewer)
-- Invite link se team join karna
-- Multi-file editor (Monaco Editor, VS Code ka asli editor)
-- Real-time sync aur colored cursors (Yjs)
-- Browser me terminal aur code run (Docker sandbox)
-- Project chat
-- Voice/video, Git integration (roadmap me)
+## ✨ Features
 
-## Tech Stack
+- **Authentication:** Secure Login and Registration using JWT.
+- **Project & Team Management:** Organize workspaces with granular roles (Owner, Editor, Viewer) and join via invite links.
+- **Advanced Editing:** A robust multi-file editor powered by Monaco Editor (the core of VS Code).
+- **Real-Time Collaboration:** Instantaneous code sync and colored cursors using Yjs.
+- **In-Browser Terminal:** Execute code safely in a Docker-powered sandbox environment.
+- **Built-in Chat:** Project-specific chat for real-time team communication.
+- **Future Roadmap:** Voice/video calling and native Git integration.
+
+## 🛠 Tech Stack
+
 | Layer | Technology |
 | --- | --- |
-| Frontend | React, Vite, Tailwind CSS, Monaco Editor, xterm.js |
-| Live sync | Yjs, y-monaco |
-| Backend | FastAPI (Python), microservices |
-| Database | PostgreSQL, SQLAlchemy, Alembic |
-| Cache / Pub-Sub | Redis |
-| Auth | JWT, bcrypt |
-| Sandbox | Docker |
-| Deployment | Docker Compose, Nginx |
+| **Frontend** | React, Vite, Tailwind CSS, Monaco Editor, xterm.js |
+| **Live Synchronization** | Yjs, y-monaco |
+| **Backend** | FastAPI (Python), Microservices Architecture |
+| **Database** | PostgreSQL, SQLAlchemy, Alembic |
+| **Cache & Pub-Sub** | Redis |
+| **Authentication** | JWT, bcrypt |
+| **Sandbox Execution** | Docker |
+| **Deployment** | Docker Compose, Nginx |
 
-## Architecture
-```
-Frontend (React + Monaco)
-       |
-       v
-API Gateway (:8000)
-       |-- auth-service (:8001) -> auth_db
-       |-- project-service (:8002) -> project_db
-       |-- collab-service (:8003) -> collab_db + Redis
-       |-- terminal-service (:8004) -> Docker sandbox
-       |-- chat-service (:8005) -> chat_db (baad me)
-```
-Har service ka apna database hota hai, aur services aapas me REST ya Redis events se baat karti hain.
+## 🏗 Architecture Overview
 
-## Folder Structure
+Helex is built using a Microservices architecture. Each service operates independently with its own database and communicates via REST APIs or Redis events.
+
+```mermaid
+graph TD
+    UI[Frontend: React + Monaco] --> API[API Gateway :8000]
+    API --> AUTH[Auth Service :8001]
+    API --> PROJ[Project Service :8002]
+    API --> COLLAB[Collab Service :8003]
+    API --> TERM[Terminal Service :8004]
+    
+    AUTH --> DB1[(Auth DB)]
+    PROJ --> DB2[(Project DB)]
+    COLLAB --> DB3[(Collab DB + Redis)]
+    TERM --> DOCKER[[Docker Sandbox]]
+```
+
+## 📂 Folder Structure
+
 ```
 helex/
 ├── backend/
-│   ├── api-gateway/
-│   ├── auth-service/
-│   ├── project-service/
-│   ├── collab-service/
-│   ├── terminal-service/
-│   ├── chat-service/
-│   ├── shared/
-│   └── infra/            # docker-compose, nginx, db init
-├── frontend/
-├── docs/
-│   ├── api-contract.md
-│   └── architecture.md
-├── .github/
-├── .gitignore
+│   ├── api-gateway/         # Handles routing, rate limiting, and auth proxies
+│   ├── auth-service/        # Manages users, JWTs, and security
+│   ├── project-service/     # Handles workspaces, invites, and roles
+│   ├── collab-service/      # WebSocket server for Yjs real-time sync
+│   ├── terminal-service/    # Manages Docker sandboxes and web terminals
+│   ├── chat-service/        # Handles project communications (Phase 2)
+│   ├── shared/              # Shared utilities, schemas, and logging
+│   └── infra/               # Docker-compose, Nginx, and DB initialization
+├── frontend/                # React application
+├── docs/                    # Architecture and API documentation
 └── README.md
 ```
 
-## Prerequisites
-Ye sab install hona chahiye:
+## ⚙️ Prerequisites
 
-| Tool | Version |
-| --- | --- |
-| Python | 3.10+ |
-| Node.js | 18 ya 20 |
-| Docker + Docker Compose | Latest |
-| Git | Latest |
+Ensure you have the following installed before proceeding:
 
-## Getting Started
+- **Python:** 3.10+
+- **Node.js:** 18 or 20
+- **Docker & Docker Compose:** Latest versions
+- **Git:** Latest version
 
-**1. Repo clone karo**
+## 🚀 Getting Started
+
+### 1. Clone the Repository
 ```bash
 git clone https://github.com/princehk0101/Helex.git
-cd helex
+cd Helex
 ```
 
-**2. Environment files banao**
-Har service me `.env.example` ko copy karke `.env` banao aur values bharo:
+### 2. Configure Environment Variables
+Copy the example environment files for each service and fill in the required values:
 ```bash
 cp backend/auth-service/.env.example backend/auth-service/.env
 cp backend/project-service/.env.example backend/project-service/.env
@@ -86,131 +90,137 @@ cp backend/collab-service/.env.example backend/collab-service/.env
 cp backend/api-gateway/.env.example backend/api-gateway/.env
 cp frontend/.env.example frontend/.env
 ```
-Random SECRET_KEY banane ke liye:
-```bash
-python -c "import secrets; print(secrets.token_hex(32))"
-```
-*Sab services me `SECRET_KEY` same rakho, taaki JWT sab verify kar sakein.*
+> **Tip:** Generate a random `SECRET_KEY` using Python:
+> ```bash
+> python -c "import secrets; print(secrets.token_hex(32))"
+> ```
+> *Note: Ensure the `SECRET_KEY` is identical across all backend services for JWT verification to work seamlessly.*
 
-**3. Database aur Redis chalao**
+### 3. Spin up the Infrastructure (Database & Redis)
 ```bash
 cd backend/infra
 docker compose up -d postgres redis
 ```
 
-**4. Backend service chalao (example: auth-service)**
+### 4. Run a Backend Service (e.g., Auth Service)
 ```bash
 cd backend/auth-service
-python -m venv venv
-# Windows
-venv\Scripts\activate
-# Mac / Linux
-# source venv/bin/activate
 
+# Create and activate a virtual environment
+python -m venv .venv
+# On Windows: .venv\Scripts\activate
+# On Mac/Linux: source .venv/bin/activate
+
+# Install dependencies and run migrations
 pip install -r requirements.txt
 alembic upgrade head
+
+# Start the service
 uvicorn app.main:app --reload --port 8001
 ```
-Swagger docs: http://localhost:8001/docs
-Baaki services bhi isi tarah apne port par chalao.
+*Access the Swagger API documentation at: http://localhost:8001/docs. Repeat these steps for other microservices using their respective ports.*
 
-**5. Frontend chalao**
+### 5. Run the Frontend
 ```bash
 cd frontend
 npm install
 npm run dev
 ```
-App: http://localhost:5173
+*Access the application at: http://localhost:5173*
 
-**6. Sab kuch ek saath (Docker Compose)**
+### 6. Run Everything with Docker Compose
+To spin up the entire application stack automatically:
 ```bash
 cd backend/infra
 docker compose up --build
 ```
 
-## Environment Variables
-**Backend service (example):**
-| Variable | Matlab |
+## 🔐 Environment Variables Guide
+
+**Backend Service Variables:**
+| Variable | Description |
 | --- | --- |
-| DATABASE_URL | PostgreSQL connection string |
-| SECRET_KEY | JWT sign karne ki key |
-| ACCESS_TOKEN_EXPIRE_MINUTES | Token ki expiry |
-| ALLOWED_ORIGINS | CORS ke liye frontend URL |
-| REDIS_URL | Redis connection |
+| `DATABASE_URL` | PostgreSQL connection string |
+| `SECRET_KEY` | Key for signing JWTs |
+| `ACCESS_TOKEN_EXPIRE_MINUTES` | JWT token expiration time |
+| `ALLOWED_ORIGINS` | Permitted frontend URLs for CORS |
+| `REDIS_URL` | Redis connection string |
 
-**Frontend:**
-| Variable | Matlab |
+**Frontend Variables:**
+| Variable | Description |
 | --- | --- |
-| VITE_API_URL | API Gateway ka URL |
-| VITE_WS_URL | WebSocket URL |
+| `VITE_API_URL` | API Gateway endpoint |
+| `VITE_WS_URL` | WebSocket endpoint for real-time collaboration |
 
-*Kabhi bhi `.env` file Git me push mat karo.*
+> ⚠️ **Warning:** Never commit your `.env` files to Git.
 
-## Git Workflow
-| Branch | Kaam |
+## 🌿 Git Workflow
+
+We use a structured branching strategy to maintain code stability:
+
+| Branch | Purpose |
 | --- | --- |
-| `main` | Stable code, seedha push band |
-| `develop` | Sab features yahan merge hote hain |
-| `feature/<team>-<kaam>` | Naya feature, jaise feature/backend-auth |
-| `fix/<team>-<bug>` | Bug fix |
+| `main` | Production-ready stable code. Direct pushes are restricted. |
+| `develop` | Integration branch for all new features. |
+| `feature/<team>-<task>` | For new features (e.g., `feature/backend-auth`). |
+| `fix/<team>-<bug>` | For bug fixes. |
 
-**Roz ka flow:**
+**Standard Daily Flow:**
 ```bash
 git checkout develop
 git pull
 git checkout -b feature/backend-auth
-# kaam karo
+# Make your changes
 git add .
-git commit -m "feat(backend): add login API"
+git commit -m "feat(backend): implement login API"
 git push -u origin feature/backend-auth
 ```
-Phir GitHub par Pull Request kholo (feature/... to develop), reviewer tag karo, 1 approval ke baad merge.
+*After pushing, open a Pull Request (PR) against the `develop` branch. Tag reviewers and wait for at least one approval before merging.*
 
-**Commit message style:**
-| Prefix | Use |
+**Commit Message Convention:**
+- `feat:` A new feature
+- `fix:` A bug fix
+- `docs:` Documentation updates
+- `refactor:` Code refactoring without adding features or fixing bugs
+- `chore:` Maintenance tasks, setups, or configurations
+
+## 👥 Team Responsibilities
+
+| Role | Scope of Work |
 | --- | --- |
-| `feat:` | Naya feature |
-| `fix:` | Bug fix |
-| `docs:` | Documentation |
-| `refactor:` | Code saaf karna |
-| `chore:` | Setup, config |
+| **Backend 1** | API Gateway, Auth Service, Shared Utilities, Infrastructure |
+| **Backend 2** | Project Service, Collab Service, Terminal Service |
+| **Frontend 1** | Authentication, Dashboard, Workspace UI, File Explorer |
+| **Frontend 2** | Monaco & Yjs Integration, Presence, Terminal UI, Chat Interface |
 
-## Team
-| Role | Zimmedari |
-| --- | --- |
-| Backend 1 | API Gateway, Auth, Shared, Infra |
-| Backend 2 | Project, Collab, Terminal services |
-| Frontend 1 | Login, Dashboard, Workspace, File Explorer |
-| Frontend 2 | Monaco + Yjs, Presence, Terminal UI, Chat |
+## 🗺 Roadmap
 
-## Roadmap
-- [ ] Phase 1: Monaco + Yjs, 2 tabs me live sync (MVP)
-- [ ] Phase 2: Auth, JWT, database
-- [ ] Phase 3: Projects, members, roles, invite link
-- [ ] Phase 4: File explorer aur multi-file tabs
-- [ ] Phase 5: Persistence (Yjs state DB me)
-- [ ] Phase 6: Presence aur cursor UI
-- [ ] Phase 7: Terminal aur Docker sandbox
-- [ ] Phase 8: Chat
-- [ ] Phase 9: Deployment (Nginx, HTTPS)
-- [ ] Phase 10: Voice/video, Git, AI assistant
+- [ ] **Phase 1:** Monaco + Yjs integration, live sync across 2 tabs (MVP)
+- [ ] **Phase 2:** Authentication, JWT, and Database models
+- [ ] **Phase 3:** Projects, team members, roles, and invite links
+- [ ] **Phase 4:** File explorer and multi-file tab management
+- [ ] **Phase 5:** Persistence (saving Yjs state to the Database)
+- [ ] **Phase 6:** User presence and colored cursor UI
+- [ ] **Phase 7:** Web Terminal and Docker sandboxing
+- [ ] **Phase 8:** Project Chat integration
+- [ ] **Phase 9:** Production Deployment (Nginx, HTTPS)
+- [ ] **Phase 10:** Voice/video calling, Git integration, AI Assistant
 
-## Security Notes
-- Passwords sirf bcrypt hash me store hote hain
-- User ka code hamesha Docker sandbox me chalta hai (memory, CPU aur network limits ke saath)
-- Har API aur WebSocket par permission check
-- Production me HTTPS/WSS zaroori hai
+## 🛡 Security Notes
 
-## Documentation
-- [API Contract](docs/api-contract.md)
-- [Architecture](docs/architecture.md)
+- All user passwords are encrypted using `bcrypt`.
+- User-executed code strictly runs in isolated Docker sandboxes with enforced Memory, CPU, and Network constraints.
+- Authorization and permission checks are strictly enforced on all REST APIs and WebSockets.
+- Production deployments require HTTPS and WSS for secure data transit.
 
-## Contributing
-1. Issue kholo ya existing issue lo
-2. Branch banao
-3. Chhote, saaf commits karo
-4. PR kholo aur review maango
-5. Merge ke baad branch delete karo
+## 🤝 Contributing
 
-## License
-Abhi decide nahi hua. (MIT, Apache-2.0 ya private rakh sakte ho.)
+1. Claim or open an issue.
+2. Create a new branch following the Git Workflow.
+3. Make small, logical, and clean commits.
+4. Open a Pull Request and request a review.
+5. Delete your branch after it has been merged.
+
+## 📄 License
+
+This project is licensed under the [MIT License](LICENSE).
