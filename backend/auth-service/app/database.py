@@ -1,18 +1,8 @@
 from sqlalchemy import create_engine
-from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy.orm import sessionmaker
-import os
-from dotenv import load_dotenv
+from sqlalchemy.orm import sessionmaker, declarative_base
+from app.config import settings
 
-load_dotenv()
-
-# We use SQLite by default if DATABASE_URL is not set. For production/docker use PostgreSQL.
-DATABASE_URL = os.getenv("DATABASE_URL", "sqlite:///./auth.db")
-
-# SQLite needs check_same_thread=False
-connect_args = {"check_same_thread": False} if "sqlite" in DATABASE_URL else {}
-
-engine = create_engine(DATABASE_URL, connect_args=connect_args)
+engine = create_engine(settings.DATABASE_URL)
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
 Base = declarative_base()

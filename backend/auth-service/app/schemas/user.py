@@ -1,31 +1,26 @@
 from pydantic import BaseModel, EmailStr, Field
 from datetime import datetime
-from typing import Optional
+from uuid import UUID
 
-# Pydantic models for request validation
 class UserCreate(BaseModel):
-    username: str = Field(..., min_length=3, max_length=50)
+    name: str = Field(..., min_length=2, max_length=100)
     email: EmailStr
     password: str = Field(..., min_length=6)
+    color: str = Field(..., min_length=4, max_length=9)
 
 class UserLogin(BaseModel):
-    username: str
+    email: EmailStr
     password: str
 
-# Pydantic models for response
 class UserResponse(BaseModel):
-    id: int
-    username: str
+    id: UUID
+    name: str
     email: str
-    is_active: bool
+    color: str
     created_at: datetime
 
-    class Config:
-        from_attributes = True
+    model_config = {"from_attributes": True}
 
 class Token(BaseModel):
     access_token: str
     token_type: str
-
-class TokenData(BaseModel):
-    username: Optional[str] = None

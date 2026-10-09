@@ -2,25 +2,22 @@ from sqlalchemy.orm import Session
 from app.models.user import User
 from app.schemas.user import UserCreate
 from app.core.security import get_password_hash
-from fastapi import HTTPException, status
+import sys
+import os
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "../../../shared")))
+from helex_common.exceptions import BadRequestException
 
 def create_user(db: Session, user: UserCreate):
-    # Validation: Check if username exists
-    db_user = db.query(User).filter(User.username == user.username).first()
-    if db_user:
-        raise HTTPException(status_code=400, detail="Username already registered")
-    
-    # Validation: Check if email exists
     db_email = db.query(User).filter(User.email == user.email).first()
     if db_email:
-        raise HTTPException(status_code=400, detail="Email already registered")
+        raise BadRequestException("Email already registered")
 
-    # Hash password and create user
     hashed_password = get_password_hash(user.password)
     db_user = User(
-        username=user.username,
+        name=user.name,
         email=user.email,
-        hashed_password=hashed_password
+        password_hash=hashed_password,
+        color=user.color
     )
     
     db.add(db_user)

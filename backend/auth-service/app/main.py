@@ -1,26 +1,29 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 import uvicorn
+from contextlib import asynccontextmanager
 
 from app.config import settings
 from app.database import engine, Base
 from app.routers import auth
 
-# Automatically create tables in database (good for sqlite/development without alembic)
-Base.metadata.create_all(bind=engine)
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    # Auto-create tables for now, real migration needs Alembic
+    Base.metadata.create_all(bind=engine)
+    yield
 
-app = FastAPI(title="Auth Service", version="1.0.0")
+app = FastAPI(title="Auth Service", version="1.0.0", lifespan=lifespan)
 
-# Global Middleware for CORS
+origins = [origin.strip() for origin in settings.ALLOWED_ORIGINS.split(",")]
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"], # Change this to frontend URL in production
+    allow_origins=origins,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
-# Registering Routers (Controllers)
 app.include_router(auth.router)
 
 @app.get("/health")
