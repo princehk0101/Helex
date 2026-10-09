@@ -1,9 +1,18 @@
 import React from 'react';
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import Workspace from './pages/Workspace';
+import Login from './pages/Login';
 
-export default function App() {
+function App() {
   return (
-    <div>
-      <h1>Welcome to Helex</h1>
-    </div>
+    <BrowserRouter>
+      <Routes>
+        <Route path="/" element={<Navigate to="/workspace" />} />
+        <Route path="/login" element={<Login />} />
+        <Route path="/workspace" element={<Workspace />} />
+      </Routes>
+    </BrowserRouter>
   );
 }
+
+export default App;
